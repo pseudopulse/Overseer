@@ -14,7 +14,7 @@ namespace Overseer {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "pseudopulse";
         public const string PluginName = "Overseer";
-        public const string PluginVersion = "0.4.0";
+        public const string PluginVersion = "0.7.0";
         private const bool ShouldShowLog = false;
 
         [StubShaders]

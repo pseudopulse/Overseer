@@ -17,6 +17,7 @@ namespace Overseer {
             OverseerBody = Main.assets.LoadAsset<GameObject>("OverseerBody.prefab");
             
             OverseerBody.GetComponent<CameraTargetParams>().cameraParams = Assets.CharacterCameraParams.ccpStandard;
+            OverseerBody.GetComponent<CharacterBody>().preferredPodPrefab = Assets.GameObject.RoboCratePod;
 
             contentPack.RegisterGameObject(OverseerBody);
             contentPack.RegisterScriptableObject(sdOverseer);

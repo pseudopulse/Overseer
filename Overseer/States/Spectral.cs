@@ -14,16 +14,15 @@ namespace Overseer.States {
 
         static Spectral() {
             ProjectileStandard = RuntimePrefabManager.CreatePrefab(Assets.GameObject.RoboBallProjectile, "OverseerPlasmaShot");
-            ProjectileStandard.transform.localScale = new(0.3f, 0.3f, 0.3f);
 
             ProjectileStandard.GetComponent<ProjectileImpactExplosion>().blastDamageCoefficient = 1f;
-            ProjectileStandard.GetComponent<ProjectileImpactExplosion>().blastRadius = 2f;
+            ProjectileStandard.GetComponent<ProjectileImpactExplosion>().blastRadius = 3f;
 
             ProjectileLast = RuntimePrefabManager.CreatePrefab(Assets.GameObject.RoboBallProjectile, "OverseerPlasmaShotEnd");
             ProjectileLast.AddComponent<MarkOnHit>();
 
             ProjectileLast.GetComponent<ProjectileImpactExplosion>().blastDamageCoefficient = 1f;
-            ProjectileLast.GetComponent<ProjectileImpactExplosion>().blastRadius = 2f;
+            ProjectileLast.GetComponent<ProjectileImpactExplosion>().blastRadius = 3f;
 
             Main.contentPack.RegisterGameObject(ProjectileStandard);
             Main.contentPack.RegisterGameObject(ProjectileLast);
