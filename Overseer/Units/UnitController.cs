@@ -13,7 +13,7 @@ namespace Overseer.Units {
         void Recall();
         void PerformSecondaryAction();
         void Initialize(OverseerController owner);
-        void Destruct();
+        void Destruct(bool ignoreVengeance = false);
         GameObject GetSelf();
     }
 
@@ -43,6 +43,9 @@ namespace Overseer.Units {
         private bool hasRequestedDestruction = false;
         private HurtBox destructionTarget;
         private bool isDoingInfernalDestruction = false;
+        private float altFireStopwatch = 0f;
+        protected bool isOvercharged = false;
+        private float overchargeTimer = 0f;
 
         public GameObject GetSelf() {
             return this.gameObject;
@@ -52,8 +55,12 @@ namespace Overseer.Units {
             body = GetComponent<CharacterBody>();
         }
 
-        public void Destruct() {
-            if (owner.isPassiveInfernal) {
+        public void Overcharge() {
+            
+        }
+
+        public void Destruct(bool ignoreVengenace = false) {
+            if (owner.isPassiveInfernal && !ignoreVengenace) {
                 isDoingInfernalDestruction = true;
                 
                 destructionTarget = FindNearbyEnemy();
@@ -103,6 +110,20 @@ namespace Overseer.Units {
         public virtual void FixedUpdate() {
             freeformUpdateStopwatch -= Time.fixedDeltaTime;
 
+            if (isOvercharged) {
+                overchargeTimer -= Time.fixedDeltaTime;
+
+                if (overchargeTimer <= 0f) {
+                    isOvercharged = false;
+                }
+            }
+
+            altFireStopwatch -= Time.fixedDeltaTime;
+            if (altFireStopwatch <= 0f) {
+                altFireStopwatch = Random.Range(3f, 6f);
+                PerformSecondaryAction();
+            }
+
             if (isDoingInfernalDestruction) {
 
                 if (destructionTarget) {
@@ -150,6 +171,10 @@ namespace Overseer.Units {
                     freeformTargetPos = owner.body.corePosition + (Random.onUnitSphere * FreeformDistance);
                     freeformTargetPos.y = owner.body.corePosition.y + Random.Range(-0.5f, 1.5f);
                 }
+            }
+
+            if (!body) {
+                return;
             }
 
             if (!body.healthComponent.alive && !hasRequestedDestruction) {

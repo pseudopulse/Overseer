@@ -4,12 +4,11 @@ namespace Overseer.States {
     public class Dash : BaseState {
         public static GameObject TPEffect;
         public static GameObject TPTracer;
-
         public Vector3 blinkVector;
         public CharacterModel model;
         public HurtBoxGroup hbg;
-        public float duration = 0.1f;
-        public float speedCoeff = 15f;
+        public float duration = 0.2f;
+        public float speedCoeff = 5f;
         public Vector3 startPos;
         public override void OnEnter()
         {

@@ -19,9 +19,15 @@ namespace Overseer.Components {
             for (int i = 0; i < actionElements.Length; i++) {
                 actionElements[i].action = actions[i];
                 actionElements[i].Initialize();
-                // Debug.Log(actionElements[i].action);
+                // Main.Log(actionElements[i].action);
             }
         }       
+
+        public void UpdateBasedOnUnitChoices(Unit offense, Unit defense, Unit support) {
+            actionElements[0].image.sprite = offense.Icon;
+            actionElements[1].image.sprite = defense.Icon;
+            actionElements[2].image.sprite = support.Icon;
+        }
 
         public void FixedUpdate() {
             for (int i = 0; i < actionElements.Length; i++) {

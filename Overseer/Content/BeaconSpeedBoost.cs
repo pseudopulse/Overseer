@@ -12,7 +12,7 @@ namespace Overseer.Content {
                 orig(self);
 
                 if (NetworkServer.active && self.HasBuff(BeaconSpeed)) {
-                    float increase = 1f + (0.02f * (self.GetBuffCount(BeaconSpeed)));
+                    float increase = 1f + (0.05f * (self.GetBuffCount(BeaconSpeed)));
                     self.moveSpeed *= increase;
                 }
             };

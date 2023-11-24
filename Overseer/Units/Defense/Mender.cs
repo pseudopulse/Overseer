@@ -7,20 +7,27 @@ namespace Overseer.Units.Defense {
         public override HurtBox Target { get; set; }
         private float stopwatch = 0f;
         public override HurtboxTracker.TargetType TargetType => HurtboxTracker.TargetType.Friendly;
-        private bool formationClose = false;
+        private bool formationClose = true;
 
         public override void OverrideTarget(HurtBox newTarget)
         {
-            Target = newTarget;
+            
         }
 
         public override void PerformMovement(int totalUnits, int thisUnit)
         {
-            OrbitalMovement(totalUnits, thisUnit, formationClose ? 360f : 180f, formationClose ? 0f : -90f, formationClose ? 1.5f : 3f);
+            if (formationClose) {
+                OrbitalMovement(totalUnits, thisUnit, 360f, 0f, 1.5f);
+            }
+            else {
+                OrbitalMovement(totalUnits, thisUnit, 20f, (20f / 2f) * -1f, 3f);
+            }
         }
 
         public override void PerformSecondaryAction()
         {
+            return;
+            
             List<CharacterBody> bodies = CharacterBody.readOnlyInstancesList.Where(x => x.GetComponent<OverseerController>() || x.GetComponent<UnitController>()).ToList();
             foreach (CharacterBody body in bodies) {
                 if (Vector3.Distance(Target.transform.position, body.corePosition) < 15) {

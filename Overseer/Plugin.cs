@@ -12,9 +12,10 @@ namespace Overseer {
     [BepInDependency("pseudopulse.YAU")]
     public class Main : BaseUnityPlugin {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
-        public const string PluginAuthor = "ModAuthorName";
+        public const string PluginAuthor = "pseudopulse";
         public const string PluginName = "Overseer";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "0.4.0";
+        private const bool ShouldShowLog = false;
 
         [StubShaders]
         public static AssetBundle assets;
@@ -36,6 +37,18 @@ namespace Overseer {
 
             UnitCatalog.Initialize();
             States.Dash.CreatePrefabs();
+
+            foreach (Material material in assets.LoadAllAssets<Material>()) {
+                material.shader = Assets.Shader.HGStandard;
+            }
+        }
+
+        public static void Log(string text) {
+            if (!ShouldShowLog) {
+                return;
+            }
+
+            Debug.Log(text);
         }
     }
 }

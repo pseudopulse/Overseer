@@ -16,6 +16,10 @@ namespace Overseer.Units.Offense {
 
         public override void PerformMovement(int totalUnits, int thisUnit)
         {
+            if (Target && isFreeform && Vector3.Distance(Target.transform.position, base.transform.position) < 5f) {
+                return;
+            }
+
             if (isFreeform) {
                 FreeformMovement();
             }
@@ -29,9 +33,13 @@ namespace Overseer.Units.Offense {
 
         public override void PerformSecondaryAction()
         {
+            if (!isFreeform && !Target) {
+                return;
+            }
+
             FireProjectileInfo info = new();
             info.crit = Util.CheckRoll(owner.body.crit);
-            info.damage = owner.body.damage * 5f;
+            info.damage = owner.body.damage * 2f;
             info.owner = owner.gameObject;
             info.position = base.transform.position;
             info.rotation = Util.QuaternionSafeLookRotation((isFreeform && Target ? Target.transform.position - base.transform.position : owner.AimPoint - base.transform.position).normalized);
@@ -65,6 +73,18 @@ namespace Overseer.Units.Offense {
                     FireLaserFlank();
                 }
             }
+
+            if (Target) {
+                base.transform.forward = (Target.transform.position - base.transform.position).normalized;
+            }
+            if (!isFreeform) {
+                base.transform.forward = (owner.AimPoint - base.transform.position).normalized;
+            }
+            
+            if (isFreeform && !Target) {
+                base.transform.forward = (owner.body.corePosition - base.transform.position).normalized;
+            }
+            
         }
 
         public void FireLaser() {
@@ -73,14 +93,20 @@ namespace Overseer.Units.Offense {
             attack.owner = owner.gameObject;
             attack.weapon = base.gameObject;
             attack.aimVector = (Target.transform.position - base.transform.position).normalized;
-            attack.damage = owner.body.damage * owner.UnitEffectModifier;
+            attack.damage = owner.body.damage * owner.UnitEffectModifier * 0.5f;
             attack.isCrit = Util.CheckRoll(owner.body.crit);
             attack.minSpread = 0f;
-            attack.maxSpread = 1.5f;
+            attack.maxSpread = 3f;
             attack.procCoefficient = 1f;
             attack.damageColorIndex = DamageColorIndex.Item;
             attack.tracerEffectPrefab = Assets.GameObject.TracerCaptainDefenseMatrix;
             attack.Fire();
+
+            BaseAI ai = Target.healthComponent.body.master?.GetComponent<BaseAI>() ?? null;
+
+            if (ai) {
+                ai.currentEnemy.gameObject = base.gameObject;
+            }
 
             AkSoundEngine.PostEvent(WwiseEvents.Play_captain_drone_zap, base.gameObject);
         }
@@ -90,17 +116,29 @@ namespace Overseer.Units.Offense {
             attack.origin = base.transform.position;
             attack.owner = owner.gameObject;
             attack.weapon = base.gameObject;
-            attack.aimVector = (owner.AimPoint - base.transform.position).normalized;
-            attack.damage = owner.body.damage * owner.UnitEffectModifier;
+            attack.aimVector = GetFlankLaserAimDir();
+            attack.damage = owner.body.damage * owner.UnitEffectModifier * 1f;
             attack.isCrit = Util.CheckRoll(owner.body.crit);
             attack.minSpread = 0f;
             attack.maxSpread = 0f;
             attack.procCoefficient = 1f;
             attack.damageColorIndex = DamageColorIndex.Item;
             attack.tracerEffectPrefab = Assets.GameObject.TracerCaptainDefenseMatrix;
+            attack.stopperMask = LayerIndex.world.collisionMask;
             attack.Fire();
 
             AkSoundEngine.PostEvent(WwiseEvents.Play_captain_drone_zap, base.gameObject);
+        }
+
+        public Vector3 GetFlankLaserAimDir() {
+            Ray aimRay = owner.body.inputBank.GetAimRay();
+
+            if (Physics.Raycast(aimRay, out RaycastHit info, 4000f, LayerIndex.world.mask, QueryTriggerInteraction.Ignore)) {
+                Vector3 dir = (info.point - base.transform.position).normalized;
+                return dir;
+            }
+            
+            return aimRay.direction;
         }
 
         public override void Recall()

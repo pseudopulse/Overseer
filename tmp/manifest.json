@@ -2,7 +2,7 @@
 	"name": "Overseer",
 	"version_number": "1.0.0",
 	"website_url": "",
-	"description": "Adds the Overseer, commanding an army of mechanical minions. (WIP)",
+	"description": "ModDesc",
 	"dependencies": [
 		"bbepis-BepInExPack-5.4.9",
 		"RiskofThunder-HookGenPatcher-1.2.1"

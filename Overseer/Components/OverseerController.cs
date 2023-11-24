@@ -24,7 +24,9 @@ namespace Overseer.Components {
         internal bool isPassiveInfernal = false;
         internal float UnitEffectModifier = 1f;
         internal float UnitAssemblyModifier = 1f;
-
+        private GameObject MainHUDInstance;
+        private List<Unit> UnitTypes = new();
+        private int index = 0;
 
         public void Start() {
             currentUnitType = NullUnit;
@@ -86,6 +88,8 @@ namespace Overseer.Components {
 
             CharacterBody ubody = unit.GetComponent<CharacterBody>();
             ubody.level = body.level; 
+            ubody.baseDamage = body.baseDamage;
+            ubody.levelDamage = body.levelDamage;
             activeUnits.Add(iunit);
         }
 
@@ -114,32 +118,31 @@ namespace Overseer.Components {
             }
         }
 
-        public void RequestDestruction(IUnitC unit) {
+        public void Retarget(HurtBox target) {
+            foreach (IUnitC unit in activeUnits) {
+                unit.OverrideTarget(target);
+            }
+        }
+
+        public void RequestDestruction(IUnitC unit, bool ignoreVengeance = false) {
             activeUnits.Remove(unit);
             unit.Destruct();
         }
 
-        public void ReconfigureUnits(ActionType type) {
-            UnitSkillDef def = null;
+        public void ReconfigureUnits() {
+            UnitTypes.Clear();
 
-            if (type == ActionType.Cancel) {
-                return;
+            UnitTypes.Add(NullUnit);
+            UnitTypes.Add((offenseFamily.skillDef as UnitSkillDef).UnitType);
+            UnitTypes.Add((defenseFamily.skillDef as UnitSkillDef).UnitType);
+            UnitTypes.Add((supportFamily.skillDef as UnitSkillDef).UnitType);
+
+            index++;
+            if (index >= UnitTypes.Count) {
+                index = 0;
             }
 
-            switch (type) {
-                case ActionType.BuildOffense:
-                    def = offenseFamily.skillDef as UnitSkillDef;
-                    break;
-                case ActionType.BuildDefense:
-                    def = defenseFamily.skillDef as UnitSkillDef;
-                    break;
-                case ActionType.BuildSupport:
-                    def = supportFamily.skillDef as UnitSkillDef;
-                    break;
-            }
-
-            // Debug.Log(currentUnitType);
-            currentUnitType = def.UnitType;
+            currentUnitType = UnitTypes[index];
         }
 
         public float GetAssemblyTime() {
@@ -165,6 +168,17 @@ namespace Overseer.Components {
             }
             
             AimPoint = body.inputBank.GetAimRay().GetPoint(40f);
+
+            if (!MainHUDInstance) {
+                MainHUDInstance = GameObject.Find("HUDSimple(Clone)");
+                if (MainHUDInstance) {
+                    MainHUDInstance = MainHUDInstance.transform.Find("MainContainer").Find("MainUIArea").gameObject;
+                }
+            }
+
+            if (MainHUDInstance) {
+                UIPrefabInstance.SetActive(MainHUDInstance.activeInHierarchy);
+            }
         }
     }
 }
